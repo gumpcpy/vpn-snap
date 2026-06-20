@@ -90,8 +90,8 @@ nano ~/.config/vpn-mac/profiles/primary.env
 
 ```bash
 PROFILE_LABEL="主線路"
-VPN_HOST="70.36.125.49:5001"
-VPN_USER="gumpcpy"
+VPN_HOST="vpn.example.com:5001"
+VPN_USER="your.username"
 ```
 
 ```bash
@@ -101,8 +101,8 @@ nano ~/.config/vpn-mac/profiles/backup.env
 
 ```bash
 PROFILE_LABEL="備用線路"
-VPN_HOST="另一個.ip:5001"
-VPN_USER="gumpcpy"
+VPN_HOST="vpn-backup.example.com:5001"
+VPN_USER="your.username"
 ```
 
 ### 3. 儲存密碼到 Keychain
