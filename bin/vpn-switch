@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -L "$SOURCE" ]]; do
+  DIR="$(cd "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPT_DIR="$(cd "$(dirname "$SOURCE")/.." && pwd)"
+# shellcheck source=../lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
+
+main() {
+  local profile="${1:-}"
+
+  if [[ -z "$profile" ]]; then
+    echo "用法: vpn-switch <線路名稱>" >&2
+    echo >&2
+    "$SCRIPT_DIR/bin/vpn-list" >&2
+    exit 1
+  fi
+
+  if is_connected; then
+    echo "目前已連線，正在斷線 ..."
+    "$SCRIPT_DIR/bin/vpn-disconnect" >/dev/null 2>&1 || true
+    sleep 1
+  fi
+
+  set_active_profile "$profile"
+  load_config "$profile"
+
+  echo "已切換預設線路 → $profile（$(profile_label) → $VPN_HOST）"
+  notify "VpnSnap" "預設線路：$(profile_label)"
+
+  read -r -p "是否立即連線？[Y/n] " answer
+  if [[ -z "$answer" || "$answer" =~ ^[Yy]$ ]]; then
+    "$SCRIPT_DIR/bin/vpn-connect"
+  fi
+}
+
+main "$@"

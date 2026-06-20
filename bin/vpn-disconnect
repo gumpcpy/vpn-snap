@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -L "$SOURCE" ]]; do
+  DIR="$(cd "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPT_DIR="$(cd "$(dirname "$SOURCE")/.." && pwd)"
+# shellcheck source=../lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
+
+main() {
+  load_config
+
+  if ! is_connected; then
+    msg="VPN 本來就是斷線狀態"
+    echo "$msg"
+    notify "VPN" "$msg"
+    exit 0
+  fi
+
+  echo "正在斷開 VPN ..."
+  "$VPN_BIN" disconnect >/dev/null 2>&1 || true
+  sleep 1
+
+  if is_connected; then
+    notify "VPN 斷線失敗" "請手動檢查 Cisco Secure Client"
+    exit 1
+  fi
+
+  notify "VPN 已斷線" "$VPN_HOST"
+  echo "已斷線"
+}
+
+main "$@"

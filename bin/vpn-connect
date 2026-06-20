@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -L "$SOURCE" ]]; do
+  DIR="$(cd "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPT_DIR="$(cd "$(dirname "$SOURCE")/.." && pwd)"
+# shellcheck source=../lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
+
+QUIET=false
+PROFILE=""
+
+for arg in "$@"; do
+  case "$arg" in
+    --quiet|-q) QUIET=true ;;
+    -*) ;;
+    *)
+      if [[ -z "$PROFILE" ]]; then
+        PROFILE="$arg"
+      fi
+      ;;
+  esac
+done
+
+main() {
+  load_config "$PROFILE"
+
+  if is_connected; then
+    if [[ -n "$PROFILE" && "$PROFILE" != "$(get_active_profile)" ]]; then
+      echo "目前已連線，先斷線再切換到 $(profile_label) ..."
+      "$SCRIPT_DIR/bin/vpn-disconnect" >/dev/null 2>&1 || true
+      sleep 1
+    else
+      msg="VPN 已經連線中（$(profile_label) → $VPN_HOST）"
+      echo "$msg"
+      notify "VpnSnap" "$msg"
+      exit 0
+    fi
+  fi
+
+  local password
+  password="$(get_password)"
+
+  echo "正在連線 [$(profile_label)] → $VPN_HOST ..."
+
+  local output
+  output="$(build_vpn_input "$password" | "$VPN_BIN" connect "$VPN_HOST" -s 2>&1)" || {
+    echo "$output" >&2
+    notify "VpnSnap 連線失敗" "$(profile_label) — 請檢查帳密或 MFA"
+    exit 1
+  }
+
+  if [[ "$QUIET" != true ]]; then
+    echo "$output"
+  fi
+
+  sleep 1
+  if is_connected; then
+    notify "VpnSnap 已連線" "$(profile_label) → $VPN_HOST"
+    echo "連線成功"
+  else
+    notify "VpnSnap 連線失敗" "$(profile_label) — 請檢查終端機輸出"
+    echo "$output"
+    exit 1
+  fi
+}
+
+main "$@"

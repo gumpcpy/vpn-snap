@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -L "$SOURCE" ]]; do
+  DIR="$(cd "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPT_DIR="$(cd "$(dirname "$SOURCE")/.." && pwd)"
+# shellcheck source=../lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
+
+main() {
+  if [[ ! -f "$CONFIG_FILE" ]]; then
+    echo "找不到設定檔: $CONFIG_FILE" >&2
+    exit 1
+  fi
+
+  # shellcheck source=/dev/null
+  source "$CONFIG_FILE"
+
+  local active profiles
+  active="$(get_active_profile)"
+  profiles="$(list_profile_names)"
+
+  if [[ -z "$profiles" ]]; then
+    echo "尚無線路設定。請在 $(profiles_dir)/ 建立 .env 檔案"
+    echo "範例: cp profiles/primary.env.example ~/.config/vpn-mac/profiles/primary.env"
+    exit 0
+  fi
+
+  echo "可用線路："
+  while IFS= read -r name; do
+    [[ -z "$name" ]] && continue
+    # shellcheck source=/dev/null
+    source "$(profile_path "$name")"
+    if [[ "$name" == "$active" ]]; then
+      echo "  * $name — ${PROFILE_LABEL:-$name} ($VPN_HOST)  ← 目前預設"
+    else
+      echo "    $name — ${PROFILE_LABEL:-$name} ($VPN_HOST)"
+    fi
+  done <<< "$profiles"
+}
+
+main "$@"

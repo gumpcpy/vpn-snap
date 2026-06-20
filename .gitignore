@@ -1,0 +1,25 @@
+# 本機設定（含 VPN 位址、帳號，勿提交）
+config.env
+.env
+.env.*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# 安裝產物（若誤建在專案目錄內）
+*.app/
+
+# 編輯器 / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 日誌與暫存
+*.log
+*.tmp
+*.pid
