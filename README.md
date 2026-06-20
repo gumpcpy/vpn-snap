@@ -5,8 +5,8 @@
 不用每次打開官方 App、選伺服器、輸入密碼——點一下 **VpnSnap** 或一行指令就能連上。
 
 <p align="center">
-  <img src="assets/icons/connect.png" width="96" alt="VpnSnap Connect">
-  <img src="assets/icons/disconnect.png" width="96" alt="VpnSnap Disconnect">
+  <img src="assets/icons/vpn_on.png" width="96" alt="VpnSnap Connect">
+  <img src="assets/icons/vpn_off.png" width="96" alt="VpnSnap Disconnect">
 </p>
 
 ## 原理
@@ -150,8 +150,8 @@ vpn-snap/
 │   ├── primary.env.example   # 主線路範本
 │   └── backup.env.example    # 備用線路範本
 ├── assets/icons/
-│   ├── connect.png       # VpnSnap 連線圖示
-│   └── disconnect.png    # VpnSnap 斷線圖示
+│   ├── vpn_on.png        # VpnSnap 連線圖示
+│   └── vpn_off.png       # VpnSnap 斷線圖示
 ├── bin/
 │   ├── vpn-connect       # 一鍵連線（可指定線路）
 │   ├── vpn-disconnect    # 斷線

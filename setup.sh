@@ -105,8 +105,8 @@ EOF
   echo "已建立 App: $app_dir"
 }
 
-create_app "VpnSnap" "vpn-connect" "com.vpnsnap.connect" "$SCRIPT_DIR/assets/icons/connect.png"
-create_app "VpnSnap Disconnect" "vpn-disconnect" "com.vpnsnap.disconnect" "$SCRIPT_DIR/assets/icons/disconnect.png"
+create_app "VpnSnap" "vpn-connect" "com.vpnsnap.connect" "$SCRIPT_DIR/assets/icons/vpn_on.png"
+create_app "VpnSnap Disconnect" "vpn-disconnect" "com.vpnsnap.disconnect" "$SCRIPT_DIR/assets/icons/vpn_off.png"
 
 # 移除舊版無圖示 App
 rm -rf "$HOME/Applications/VPN Connect.app" "$HOME/Applications/VPN Disconnect.app"
